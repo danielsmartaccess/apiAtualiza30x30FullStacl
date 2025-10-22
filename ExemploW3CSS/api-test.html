@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste API - Livraria</title>
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <style>
+        .container { max-width: 1000px; margin: 20px auto; }
+        .endpoint { margin: 20px 0; padding: 15px; border: 1px solid #ddd; }
+        .response { background: #f5f5f5; padding: 10px; margin: 10px 0; }
+        pre { white-space: pre-wrap; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="w3-center w3-teal w3-padding">🚀 Teste da API - Livraria</h1>
+        
+        <div class="endpoint w3-card-4 w3-margin">
+            <h3 class="w3-teal w3-padding">📚 GET - Listar todos os livros</h3>
+            <button onclick="listarLivros()" class="w3-button w3-green">Listar Livros</button>
+            <div id="response-list" class="response"></div>
+        </div>
+
+        <div class="endpoint w3-card-4 w3-margin">
+            <h3 class="w3-teal w3-padding">🔍 GET - Buscar livro por ID</h3>
+            <input type="text" id="search-id" placeholder="Digite o ID (ex: 1, 2, 3, d4c3)" class="w3-input w3-border" style="width:250px; display:inline-block;">
+            <button onclick="buscarLivro()" class="w3-button w3-blue">Buscar</button>
+            <div class="w3-margin-top">
+                <span class="w3-small w3-text-grey">IDs de exemplo: </span>
+                <button onclick="document.getElementById('search-id').value='1'; buscarLivro();" class="w3-button w3-tiny w3-light-grey">1</button>
+                <button onclick="document.getElementById('search-id').value='2'; buscarLivro();" class="w3-button w3-tiny w3-light-grey">2</button>
+                <button onclick="document.getElementById('search-id').value='3'; buscarLivro();" class="w3-button w3-tiny w3-light-grey">3</button>
+                <button onclick="document.getElementById('search-id').value='d4c3'; buscarLivro();" class="w3-button w3-tiny w3-light-grey">d4c3</button>
+            </div>
+            <div id="response-search" class="response"></div>
+        </div>
+
+        <div class="endpoint w3-card-4 w3-margin">
+            <h3 class="w3-teal w3-padding">➕ POST - Criar novo livro</h3>
+            <div class="w3-row">
+                <div class="w3-col l3 m6 s12 w3-padding-small">
+                    <label>Título:</label>
+                    <input type="text" id="novo-titulo" class="w3-input w3-border" placeholder="Título do livro">
+                </div>
+                <div class="w3-col l3 m6 s12 w3-padding-small">
+                    <label>Autor:</label>
+                    <input type="text" id="novo-autor" class="w3-input w3-border" placeholder="Nome do autor">
+                </div>
+                <div class="w3-col l3 m6 s12 w3-padding-small">
+                    <label>Preço:</label>
+                    <input type="number" step="0.01" id="novo-preco" class="w3-input w3-border" placeholder="0.00">
+                </div>
+                <div class="w3-col l3 m6 s12 w3-padding-small">
+                    <label>Estoque:</label>
+                    <input type="number" id="novo-estoque" class="w3-input w3-border" placeholder="0">
+                </div>
+            </div>
+            <button onclick="criarLivro()" class="w3-button w3-green w3-margin-top">Criar Livro</button>
+            <div id="response-create" class="response"></div>
+        </div>
+
+        <div class="endpoint w3-card-4 w3-margin">
+            <h3 class="w3-teal w3-padding">📝 PATCH - Atualizar preço</h3>
+            <input type="text" id="patch-id" placeholder="ID do livro" class="w3-input w3-border" style="width:150px; display:inline-block;">
+            <input type="number" step="0.01" id="patch-preco" placeholder="Novo preço" class="w3-input w3-border" style="width:150px; display:inline-block;">
+            <button onclick="atualizarPreco()" class="w3-button w3-orange">Atualizar Preço</button>
+            <div id="response-patch" class="response"></div>
+        </div>
+
+        <div class="endpoint w3-card-4 w3-margin">
+            <h3 class="w3-teal w3-padding">🗑️ DELETE - Remover livro</h3>
+            <input type="text" id="delete-id" placeholder="ID do livro" class="w3-input w3-border" style="width:200px; display:inline-block;">
+            <button onclick="removerLivro()" class="w3-button w3-red">Remover Livro</button>
+            <div id="response-delete" class="response"></div>
+        </div>
+
+        <div class="w3-panel w3-pale-yellow w3-border-yellow">
+            <h4>💡 Dicas:</h4>
+            <ul>
+                <li>O primeiro livro (ID: 1) tem preço atualizado automaticamente a cada 30 segundos</li>
+                <li>Use as ferramentas de desenvolvedor (F12) para ver as requisições</li>
+                <li>Experimente diferentes filtros na URL: ?autor=Machado&preco_gte=30</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3000';
+
+        async function listarLivros() {
+            try {
+                const response = await fetch(`${API_BASE}/livros`);
+                const data = await response.json();
+                document.getElementById('response-list').innerHTML = 
+                    `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+            } catch (error) {
+                document.getElementById('response-list').innerHTML = 
+                    `<div class="w3-red w3-padding">Erro: ${error.message}</div>`;
+            }
+        }
+
+        async function buscarLivro() {
+            const id = document.getElementById('search-id').value;
+            if (!id) {
+                alert('Digite um ID');
+                return;
+            }
+            
+            try {
+                console.log(`Buscando livro com ID: ${id}`);
+                const response = await fetch(`${API_BASE}/livros/${id}`);
+                
+                console.log(`Status da resposta: ${response.status}`);
+                
+                if (!response.ok) {
+                    if (response.status === 404) {
+                        document.getElementById('response-search').innerHTML = 
+                            `<div class="w3-red w3-padding">Livro com ID "${id}" não encontrado!</div>
+                             <div class="w3-pale-yellow w3-padding w3-margin-top">
+                                <strong>IDs disponíveis:</strong> 1, 2, 3, d4c3
+                             </div>`;
+                        return;
+                    } else {
+                        throw new Error(`Erro HTTP: ${response.status}`);
+                    }
+                }
+                
+                const data = await response.json();
+                document.getElementById('response-search').innerHTML = 
+                    `<div class="w3-green w3-padding">Livro encontrado!</div>
+                     <pre>${JSON.stringify(data, null, 2)}</pre>`;
+            } catch (error) {
+                console.error('Erro na busca:', error);
+                document.getElementById('response-search').innerHTML = 
+                    `<div class="w3-red w3-padding">Erro: ${error.message}</div>
+                     <div class="w3-pale-red w3-padding w3-margin-top">
+                        <strong>Debug:</strong> Verifique o console (F12) para mais detalhes
+                     </div>`;
+            }
+        }
+
+        async function criarLivro() {
+            const titulo = document.getElementById('novo-titulo').value;
+            const autor = document.getElementById('novo-autor').value;
+            const preco = parseFloat(document.getElementById('novo-preco').value);
+            const estoque = parseInt(document.getElementById('novo-estoque').value);
+
+            if (!titulo || !autor || !preco || !estoque) {
+                alert('Preencha todos os campos');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/livros`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ titulo, autor, preco, estoque })
+                });
+                const data = await response.json();
+                document.getElementById('response-create').innerHTML = 
+                    `<div class="w3-green w3-padding">Livro criado com sucesso!</div>
+                     <pre>${JSON.stringify(data, null, 2)}</pre>`;
+                
+                // Limpa os campos
+                document.getElementById('novo-titulo').value = '';
+                document.getElementById('novo-autor').value = '';
+                document.getElementById('novo-preco').value = '';
+                document.getElementById('novo-estoque').value = '';
+            } catch (error) {
+                document.getElementById('response-create').innerHTML = 
+                    `<div class="w3-red w3-padding">Erro: ${error.message}</div>`;
+            }
+        }
+
+        async function atualizarPreco() {
+            const id = document.getElementById('patch-id').value;
+            const preco = parseFloat(document.getElementById('patch-preco').value);
+
+            if (!id || !preco) {
+                alert('Digite o ID e o novo preço');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/livros/${id}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ preco })
+                });
+                const data = await response.json();
+                document.getElementById('response-patch').innerHTML = 
+                    `<div class="w3-green w3-padding">Preço atualizado!</div>
+                     <pre>${JSON.stringify(data, null, 2)}</pre>`;
+            } catch (error) {
+                document.getElementById('response-patch').innerHTML = 
+                    `<div class="w3-red w3-padding">Erro: ${error.message}</div>`;
+            }
+        }
+
+        async function removerLivro() {
+            const id = document.getElementById('delete-id').value;
+
+            if (!id) {
+                alert('Digite o ID do livro');
+                return;
+            }
+
+            if (!confirm('Tem certeza que deseja remover este livro?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/livros/${id}`, {
+                    method: 'DELETE'
+                });
+                const data = await response.json();
+                document.getElementById('response-delete').innerHTML = 
+                    `<div class="w3-green w3-padding">Livro removido com sucesso!</div>
+                     <pre>${JSON.stringify(data, null, 2)}</pre>`;
+            } catch (error) {
+                document.getElementById('response-delete').innerHTML = 
+                    `<div class="w3-red w3-padding">Erro: ${error.message}</div>`;
+            }
+        }
+
+        // Carrega os livros automaticamente quando a página abrir
+        window.onload = function() {
+            listarLivros();
+        }
+    </script>
+</body>
+</html>

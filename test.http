@@ -1,0 +1,56 @@
+### TESTE RÁPIDO - API LIVRARIA
+### Salve este arquivo como test.http e use a extensão REST Client no VS Code
+
+### 1. Listar todos os livros
+GET http://localhost:3000/livros
+
+### 2. Buscar livro específico por ID
+GET http://localhost:3000/livros/1
+
+### 3. Criar novo livro
+POST http://localhost:3000/livros
+Content-Type: application/json
+
+{
+  "titulo": "1984",
+  "autor": "George Orwell",
+  "preco": 35.90,
+  "estoque": 12
+}
+
+### 4. Atualizar livro completo (PUT)
+PUT http://localhost:3000/livros/2
+Content-Type: application/json
+
+{
+  "titulo": "Clássicos da Literatura",
+  "autor": "Vários Autores",
+  "preco": 85.00,
+  "estoque": 8
+}
+
+### 5. Atualização parcial (PATCH) - só o preço
+PATCH http://localhost:3000/livros/3
+Content-Type: application/json
+
+{
+  "preco": 55.00
+}
+
+### 6. Buscar livros por autor
+GET http://localhost:3000/livros?autor=Machado de Assis
+
+### 7. Buscar livros com preço menor que 50
+GET http://localhost:3000/livros?preco_lte=50
+
+### 8. Ordenar por preço crescente
+GET http://localhost:3000/livros?_sort=preco&_order=asc
+
+### 9. Busca por texto no título
+GET http://localhost:3000/livros?q=Príncipe
+
+### 10. Paginação - primeira página, 2 itens
+GET http://localhost:3000/livros?_page=1&_limit=2
+
+### 11. Deletar livro (cuidado!)
+# DELETE http://localhost:3000/livros/d4c3

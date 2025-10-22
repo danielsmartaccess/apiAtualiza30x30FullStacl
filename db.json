@@ -1,0 +1,32 @@
+{
+  "livros": [
+    {
+      "id": 1,
+      "titulo": "O Pequeno Príncipe",
+      "autor": "Antoine de Saint-Exupéry",
+      "preco": 109,
+      "estoque": 1
+    },
+    {
+      "id": 2,
+      "titulo": "Clássicos",
+      "autor": "Vários",
+      "preco": 81,
+      "estoque": 4
+    },
+    {
+      "id": 3,
+      "titulo": "Infantojuvenil",
+      "autor": "Vários",
+      "preco": 60,
+      "estoque": 7
+    },
+    {
+      "id": "d4c3",
+      "autor": "Machado de Assis",
+      "titulo": "Dom Casmurro",
+      "estoque": 20,
+      "preco": 39.9
+    }
+  ]
+}
